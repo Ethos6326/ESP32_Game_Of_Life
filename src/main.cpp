@@ -3,22 +3,20 @@
 #include <SPI.h>
 
 #define CELL 8             // cell size in pixels
-#define GRID_W (320 / CELL)
+#define GRID_W (320 / CELL) //Adjusted grid width and height for the IlI9341 display(320x240)
 #define GRID_H (240 / CELL)
 
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 
 bool grid[GRID_W][GRID_H];
-//uint8_t bitmap[320*240] PROGMEM; // Bitmap of the game of life
 
 void randomizeGrid();
 
 void setup() {
-  // put your setup code here, to run once
   tft.init();
   tft.setRotation(3);
   tft.fillScreen(TFT_WHITE);
-  randomizeGrid(); // Draw a random grid for the beginning
+  randomizeGrid(); // Draw a random grid once
 }
 
 int countNeighbours(int x, int y){
@@ -64,7 +62,6 @@ void randomizeGrid(){
   for(int x = 0; x < GRID_W; x++){
     for(int y = 0; y < GRID_H; y++){
       grid[x][y] = random(0,2);
-      //tft.drawRect(x*CELL, y*CELL, CELL, CELL, TFT_BLACK);
     }
   }
 }
@@ -79,7 +76,7 @@ void drawGrid() {
   for (int x = 0; x < GRID_W; x++) {
     for (int y = 0; y < GRID_H; y++) {
 
-      bool cell = grid[x][y];   // your Game of Life grid state
+      bool cell = grid[x][y];   // current Game of Life grid state
       if (!cell) continue;      // only draw ALIVE cells
 
       // top-left corner of the cell in pixels
@@ -102,35 +99,8 @@ void drawGrid() {
   }
   tft.drawBitmap(0, 0, bitmap, 320, 240, TFT_BLACK, TFT_WHITE);
 }
-/*void drawGrid(){
-  static uint8_t bitmap[320*240];
-
-
-  for(int x = 0; x < GRID_W; x++){
-    for(int y = 0; y < GRID_H; y++){
-      
-      bool cell = grid[x][y];
-      if(!cell){
-        continue;
-      }
-      int newX = x*CELL;
-      int newY = y*CELL;
-      for(int i = 0; i < CELL; i++){
-        for(int j = 0; j < CELL; j++){
-          int tempX = newX + i;
-          int tempY = newY + j;
-          int xIndex = tempY + (tempX / 8)*320;
-          int yIndex = tempY%8;
-          bitmap[xIndex] |= (1 << yIndex);
-        }
-      }
-    }
-  }
-  tft.drawBitmap(0, 0, bitmap, 320, 240, TFT_BLACK, TFT_WHITE);
-}*/
 
 void loop() {
-  // put your main code here, to run repeatedly:
   getNextGrid();
   drawGrid();
   delay(3000);
